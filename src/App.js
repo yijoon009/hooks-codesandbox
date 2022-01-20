@@ -1,26 +1,20 @@
 import { useEffect, useRef } from "react";
-
-const useBeforeLeave = (onBefore) => {
-  if (typeof onBefore !== "function") {
-    return;
-  }
-  const handle = (event) => {
-    const { clientY } = event;
-    //마우스가 위로 갔을때에만 onBefore() 실행
-    if (clientY <= 0) {
-      onBefore();
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("mouseleave", handle);
-    return () => document.removeEventListener("mouseleave", handle);
-  });
-};
+import useAxios from "./useAxios";
 
 const App = () => {
-  const begForLife = () => console.log("pls dont leave");
-  useBeforeLeave(begForLife);
-  return <div className="App"></div>;
+  const { loading, data, error, refetch } = useAxios({
+    url: "https://yts.mx/api/v2/list_movies.json"
+  });
+  console.log(
+    `Loading: ${loading}\nError: ${error}\nData: ${JSON.stringify(data)}`
+  );
+  return (
+    <div className="App">
+      <h2>{data && data.status}</h2>
+      <h2>{loading && "loading"}</h2>
+      <button onClick={refetch}>Refetch</button>
+    </div>
+  );
 };
 
 export default App;

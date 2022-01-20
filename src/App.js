@@ -1,13 +1,29 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+
+const useClick = (onClick) => {
+  const element = useRef();
+  useEffect(() => {
+    if (element.current) {
+      element.current.addEventListener("click", onClick);
+    }
+    return () => {
+      if (element.current) {
+        element.current.removeEventListener("click", onClick);
+      }
+    };
+  }, []);
+  if (typeof onClick !== "function") {
+    return;
+  }
+  return element;
+};
 
 const App = () => {
-  const potato = useRef();
-  // setTimeout(() => console.log(potato.current), 5000);
-  setTimeout(() => potato.current.focus(), 5000);
+  const sayHello = () => console.log("say hello");
+  const title = useClick(sayHello);
   return (
     <div className="App">
-      <h2>Hello!</h2>
-      <input ref={potato} placeholder="la" />
+      <h1 ref={title}>Hello!</h1>
     </div>
   );
 };

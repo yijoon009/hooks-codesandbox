@@ -1,29 +1,29 @@
 import { useEffect, useRef } from "react";
 
-const useHover = (onHover) => {
-  const element = useRef();
-  useEffect(() => {
-    if (element.current) {
-      element.current.addEventListener("mouseenter", onHover);
-    }
-    return () => {
-      if (element.current) {
-        element.current.removeEventListener("mouseenter", onHover);
-      }
-    };
-  }, []);
-  if (typeof onHover !== "function") {
+const useConfirm = (message = "", onConfirm, onCancle) => {
+  if (!onConfirm || typeof onConfirm !== "function") {
     return;
   }
-  return element;
+  if (onCancle && typeof onCancle !== "function") {
+    return;
+  }
+  const confirmAction = () => {
+    if (window.confirm(message)) {
+      onConfirm();
+    } else {
+      onCancle();
+    }
+  };
+  return confirmAction;
 };
 
 const App = () => {
-  const sayHello = () => console.log("say hello");
-  const title = useHover(sayHello);
+  const deleteWorld = () => console.log("Deleting the world");
+  const abort = () => console.log("Aborted");
+  const confiemDelete = useConfirm("Are you sure?", deleteWorld, abort);
   return (
     <div className="App">
-      <h1 ref={title}>Hello!</h1>
+      <button onClick={confiemDelete}>Delete the world</button>
     </div>
   );
 };

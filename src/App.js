@@ -1,25 +1,26 @@
 import { useEffect, useRef } from "react";
 
-const usePreventLeave = () => {
-  const listener = (event) => {
-    event.preventDefault();
-    //chrome에서 필수
-    event.returnValue = "";
+const useBeforeLeave = (onBefore) => {
+  if (typeof onBefore !== "function") {
+    return;
+  }
+  const handle = (event) => {
+    const { clientY } = event;
+    //마우스가 위로 갔을때에만 onBefore() 실행
+    if (clientY <= 0) {
+      onBefore();
+    }
   };
-  const enablePrevent = () => window.addEventListener("beforeunload", listener);
-  const disablePrevent = () =>
-    window.removeEventListener("beforeunload", listener);
-  return { enablePrevent, disablePrevent };
+  useEffect(() => {
+    document.addEventListener("mouseleave", handle);
+    return () => document.removeEventListener("mouseleave", handle);
+  });
 };
 
 const App = () => {
-  const { enablePrevent, disablePrevent } = usePreventLeave();
-  return (
-    <div className="App">
-      <button onClick={enablePrevent}>Protect</button>
-      <button onClick={disablePrevent}>Unprotect</button>
-    </div>
-  );
+  const begForLife = () => console.log("pls dont leave");
+  useBeforeLeave(begForLife);
+  return <div className="App"></div>;
 };
 
 export default App;

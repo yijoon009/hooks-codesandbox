@@ -1,29 +1,23 @@
 import { useEffect, useRef } from "react";
 
-const useConfirm = (message = "", onConfirm, onCancle) => {
-  if (!onConfirm || typeof onConfirm !== "function") {
-    return;
-  }
-  if (onCancle && typeof onCancle !== "function") {
-    return;
-  }
-  const confirmAction = () => {
-    if (window.confirm(message)) {
-      onConfirm();
-    } else {
-      onCancle();
-    }
+const usePreventLeave = () => {
+  const listener = (event) => {
+    event.preventDefault();
+    //chrome에서 필수
+    event.returnValue = "";
   };
-  return confirmAction;
+  const enablePrevent = () => window.addEventListener("beforeunload", listener);
+  const disablePrevent = () =>
+    window.removeEventListener("beforeunload", listener);
+  return { enablePrevent, disablePrevent };
 };
 
 const App = () => {
-  const deleteWorld = () => console.log("Deleting the world");
-  const abort = () => console.log("Aborted");
-  const confiemDelete = useConfirm("Are you sure?", deleteWorld, abort);
+  const { enablePrevent, disablePrevent } = usePreventLeave();
   return (
     <div className="App">
-      <button onClick={confiemDelete}>Delete the world</button>
+      <button onClick={enablePrevent}>Protect</button>
+      <button onClick={disablePrevent}>Unprotect</button>
     </div>
   );
 };
